@@ -116,7 +116,7 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
 
     sigclient = [SignalClient getInstance];
     sigclient.delegate = self;
-    [sigclient createConnect:myAddr];
+    ////[sigclient createConnect:myAddr];
     
     myState = @"init";
     
@@ -361,6 +361,18 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
                                                         sdpMLineIndex:index
                                                                sdpMid:sdpMid];;
     [peerConnection addIceCandidate:candidate];
+}
+
+- (void)connected {
+    [[SignalClient getInstance]  joinRoom: myRoom];
+}
+
+- (void)connect_error {
+    //todo: notfiy UI
+}
+
+- (void)connect_timeout {
+    //todo: notfiy UI
 }
 
 #pragma mark RTCPeerConnectionDelegate

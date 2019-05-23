@@ -48,8 +48,18 @@ static SignalClient* m_instance = nil;
     
     [socket on:@"connect" callback:^(NSArray* data, SocketAckEmitter* ack) {
         NSLog(@"socket connected");
+        [self.delegate connected];
     }];
     
+    [socket on:@"connect_error" callback:^(NSArray* data, SocketAckEmitter* ack) {
+        NSLog(@"socket connect_error");
+        [self.delegate connect_error];
+    }];
+    
+    [socket on:@"connect_timeout" callback:^(NSArray* data, SocketAckEmitter* ack) {
+        NSLog(@"socket connected");
+        [self.delegate connect_timeout];
+    }];
     //    [socket on:@"currentAmount" callback:^(NSArray* data, SocketAckEmitter* ack) {
     //        double cur = [[data objectAtIndex:0] floatValue];
     //

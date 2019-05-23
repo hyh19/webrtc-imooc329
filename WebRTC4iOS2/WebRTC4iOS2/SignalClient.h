@@ -22,6 +22,10 @@
 - (void) answer: (NSString*) room message: (NSDictionary*) dict;
 - (void) offer: (NSString*) room message: (NSDictionary*) dict;
 - (void) candidate: (NSString*) room message: (NSDictionary*) dict;
+- (void) connected;
+- (void) connect_error;
+- (void) connect_timeout;
+
 @end
 
 @interface SignalClient : NSObject

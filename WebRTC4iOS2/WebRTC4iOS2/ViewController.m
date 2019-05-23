@@ -73,9 +73,9 @@
     
     [self.view addSubview:self.joinBtn];
     
-    self.call = [[CallViewController alloc] initAddr:self.addr.text withRoom: self.room.text];
-    [self.call.view setFrame:self.view.bounds];
-    [self.call.view setBackgroundColor:[UIColor whiteColor]];
+//    self.call = [[CallViewController alloc] initAddr:self.addr.text withRoom: self.room.text];
+//    [self.call.view setFrame:self.view.bounds];
+//    [self.call.view setBackgroundColor:[UIColor whiteColor]];
     
 //    NSURL* url = [[NSURL alloc] initWithString:@"http://localhost:8080"];
 //    SocketManager* manager = [[SocketManager alloc] initWithSocketURL:url config:@{@"log": @YES, @"compress": @YES}];
@@ -107,14 +107,16 @@
 - (void)btnClick:(UIButton*)sender{
     NSLog(@"on click!");
 
+    self.call = [[CallViewController alloc] initAddr:self.addr.text withRoom: self.room.text];
+    [self.call.view setFrame:self.view.bounds];
+    [self.call.view setBackgroundColor:[UIColor whiteColor]];
+
     [self addChildViewController:self.call];
     [self.call didMoveToParentViewController:self];
     
     [self.view addSubview:self.call.view];
     
-    sigclient = [SignalClient getInstance];
-    [sigclient joinRoom:@"111111"];
-    
+    [[SignalClient getInstance] createConnect: self.addr.text];
 }
 
 #pragma mark protocal EventNotify
