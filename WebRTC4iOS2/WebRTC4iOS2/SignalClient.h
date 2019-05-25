@@ -25,6 +25,7 @@
 - (void) connected;
 - (void) connect_error;
 - (void) connect_timeout;
+- (void) reconnectAttempt;
 
 @end
 

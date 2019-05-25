@@ -54,7 +54,7 @@ static CGFloat const kLocalVideoViewPadding = 8;
 
 //static NSString *const RTCSTUNServerURL = @"stun:stun.l.google.com:19302";
 static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
-
+static int logY = 0;
 - (instancetype) initAddr:(NSString*) addr withRoom:(NSString*) room {
     
     myAddr = addr;
@@ -65,7 +65,7 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    logY = 0;
     CGRect bounds = self.view.bounds;
     
     self.remoteVideoView = [[RTCEAGLVideoView alloc] initWithFrame:self.view.bounds];
@@ -120,6 +120,20 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
     
     myState = @"init";
     
+}
+
+-(void)addLogToScreen:(NSString *)format, ...{
+    
+    va_list paramList;
+    va_start(paramList,format);
+    NSString* log = [[NSString alloc]initWithFormat:format arguments:paramList];
+    va_end(paramList);
+    
+    CGRect labelRect = CGRectMake(0, logY++ * 20, 500, 200);
+    UILabel *label = [[UILabel alloc] initWithFrame:labelRect];
+    label.text = log;
+    label.textColor = [UIColor redColor];
+    [self.view addSubview:label];
 }
 
 //- (void) startTimer {
@@ -189,16 +203,19 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
     }
     
     NSLog(@"leave room(%@)", myRoom);
+    [self addLogToScreen: @"leave room(%@)", myRoom];
 }
 
 #pragma mark - SignalEventNotify
 
 - (void) leaved:(NSString *)room {
     NSLog(@"leaved room(%@) notify!", room);
+    [self addLogToScreen: @"leaved room(%@) notify!", room];
 }
 
 - (void) joined:(NSString *)room {
     NSLog(@"joined room(%@) notify!", room);
+    [self addLogToScreen: @"joined room(%@) notify!", room];
     
     myState = @"joined";
     
@@ -210,7 +227,7 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
 
 - (void) otherjoin:(NSString *)room User:(NSString *)uid {
     NSLog(@"other user(%@) has been joined into room(%@) notify!", uid, room);
-    
+    [self addLogToScreen: @"other user(%@) has been joined into room(%@) notify!", uid, room];
     if([myState isEqualToString:@"joined_unbind"]){
         if (!peerConnection) {
             peerConnection = [self createPeerConnection];
@@ -225,6 +242,7 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
 
 - (void) full:(NSString *)room {
     NSLog(@"the room(%@) is full notify!", room);
+    [self addLogToScreen: @"the room(%@) is full notify!", room];
     myState = @"leaved";
     
     if(peerConnection) {
@@ -265,6 +283,7 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
 
 - (void) byeFrom:(NSString *)room User:(NSString *)uid {
     NSLog(@"the user(%@) has leaved from room(%@) notify!", uid, room);
+    [self addLogToScreen: @"the user(%@) has leaved from room(%@) notify!", uid, room];
     myState = @"joined_unbind";
     
     [peerConnection close];
@@ -365,16 +384,25 @@ static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
 
 - (void)connected {
     [[SignalClient getInstance]  joinRoom: myRoom];
+    [self addLogToScreen: @"socket connect success!"];
+    [self addLogToScreen: @"joinRoom: %@", myRoom];
+    
+
 }
 
 - (void)connect_error {
     //todo: notfiy UI
+    [self addLogToScreen: @"socket connect_error!"];
 }
 
 - (void)connect_timeout {
     //todo: notfiy UI
+    [self addLogToScreen: @"socket connect_timeout!"];
 }
 
+- (void) reconnectAttempt{
+    [self addLogToScreen: @"socket reconnectAttempt!"];
+}
 #pragma mark RTCPeerConnectionDelegate
 
 /** Called when the SignalingState changed. */
@@ -613,7 +641,7 @@ didRemoveIceCandidates:(NSArray<RTCIceCandidate *> *)candidates {
 
 - (void) doStartCall {
     NSLog(@"Start Call, Wait ...");
-    
+    [self addLogToScreen: @"Start Call, Wait ..."];
     if (!peerConnection) {
         peerConnection = [self createPeerConnection];
     }

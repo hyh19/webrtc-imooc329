@@ -37,12 +37,21 @@ static SignalClient* m_instance = nil;
 
 - (void) createConnect: (NSString*) addr {
     NSLog(@"the server addr is %@", addr);
-    
+    /*
+     log 是否打印日志
+     forcePolling  是否强制使用轮询
+     reconnectAttempts 重连次数，-1表示一直重连
+     reconnectWait 重连间隔时间
+     forceWebsockets 是否强制使用websocket
+     */
     NSURL* url = [[NSURL alloc] initWithString:addr];
     manager = [[SocketManager alloc] initWithSocketURL:url
                                                 config:@{@"log": @YES,
                                                          @"forcePolling":@YES,
-                                                         @"forceWebsockets":@YES}];
+                                                         @"forceWebsockets":@YES,
+                                                         @"reconnectAttempts":@(5),
+                                                         @"reconnectWait":@(1)
+                                                         }];
     //socket = manager.defaultSocket;
     socket = [manager socketForNamespace:@"/"];
     
@@ -51,14 +60,14 @@ static SignalClient* m_instance = nil;
         [self.delegate connected];
     }];
     
-    [socket on:@"connect_error" callback:^(NSArray* data, SocketAckEmitter* ack) {
+    [socket on:@"error" callback:^(NSArray* data, SocketAckEmitter* ack) {
         NSLog(@"socket connect_error");
         [self.delegate connect_error];
     }];
     
-    [socket on:@"connect_timeout" callback:^(NSArray* data, SocketAckEmitter* ack) {
-        NSLog(@"socket connected");
-        [self.delegate connect_timeout];
+    [socket on:@"reconnectAttempt" callback:^(NSArray* data, SocketAckEmitter* ack) {
+        NSLog(@"socket reconnectAttempt");
+        [self.delegate reconnectAttempt];
     }];
     //    [socket on:@"currentAmount" callback:^(NSArray* data, SocketAckEmitter* ack) {
     //        double cur = [[data objectAtIndex:0] floatValue];
@@ -128,7 +137,11 @@ static SignalClient* m_instance = nil;
         }
     }];
     
-    [socket connect];
+    // 连接超时时间设置为3秒
+    [socket connectWithTimeoutAfter: 3.0 withHandler:^(void){
+        NSLog(@"socket connect_timeout 3.0s");
+        [self.delegate connect_timeout];
+    }];
     
 }
 
