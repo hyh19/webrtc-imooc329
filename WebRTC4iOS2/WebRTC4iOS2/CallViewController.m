@@ -53,13 +53,14 @@ static CGFloat const kLocalVideoViewSize = 120;
 static CGFloat const kLocalVideoViewPadding = 8;
 
 //static NSString *const RTCSTUNServerURL = @"stun:stun.l.google.com:19302";
-static NSString *const RTCSTUNServerURL = @"turn:xxx.xxx.xxx:3478";
+static NSString *const RTCSTUNServerURL = @"turn:stun.al.learningrtc.cn:3478";
 static int logY = 0;
 - (instancetype) initAddr:(NSString*) addr withRoom:(NSString*) room {
-    
-    myAddr = addr;
-    myRoom = room;
+    if(self = [super init]) {
+        myAddr = addr;
+        myRoom = room;
 
+    }
     return self;
 }
 
@@ -571,8 +572,8 @@ didRemoveIceCandidates:(NSArray<RTCIceCandidate *> *)candidates {
 //初始化STUN Server （ICE Server）
 - (RTCIceServer *)defaultSTUNServer {
     return [[RTCIceServer alloc] initWithURLStrings:@[RTCSTUNServerURL]
-                                           username:@"xxx"
-                                         credential:@"xxx"];
+                                           username:@"lichao"
+                                         credential:@"mypasswd"];
 }
 
 - (void) createPeerConnectionFactory {
